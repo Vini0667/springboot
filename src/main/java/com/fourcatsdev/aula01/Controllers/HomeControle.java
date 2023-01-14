@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class HomeControle {
-    
-    @RequestMapping ("/")
-    public String index (Model model) {
+
+    @RequestMapping("/")
+    public String index(Model model) {
         model.addAttribute("msBemVindo", "Bem vindo a biblioteca");
         return "publica-index";
     }
