@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http//www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -25,6 +25,7 @@
                                 <th> CPF </th>
                                 <th> Data de Nascimento </th>
                                 <th> E-mail </th>
+                                <th> Papel </th>
                             </tr>
                         </thead>
 
@@ -39,6 +40,11 @@
                                 <td><span th:text="${#dates.format(usuario.dataNascimento, 'dd/MM/yyyy')}"> Data de Nascimento </span></td>
                                 <td><span th:text="${usuario.email}"> E-mail </span></td>
                                 <td>
+                                    <th:block th:each="pp : ${usuario.papeis}">
+                                        <span th:text="${pp.papel}"> Papel </span> <br/>
+                                    </th:block>
+                                </td>
+                                <td>
                                     <a class="btn btn-outline-danger btn-sm" th:href="@{/usuario/admin/apagar/{id}(id=${usuario.id})}" data-confirm-delete="Você vai mesmo apagar este usuário" onclick="if (!confirm(this.getAttribute('data-confirm-delete'))) return false"> 
                                         Apagar
                                     </a>
@@ -46,6 +52,11 @@
                                 <td>
                                     <a th:href="@{/usuario/admin/editar/{id}(id=${usuario.id})}" class="btn btn-outline-primary btn-sm"> 
                                         Editar
+                                    </a>
+                                </td>
+                                <td>
+                                    <a th:href="@{/usuario/admin/editar/papeis/{id}(id=${usuario.id})}" class="btn btn-outline-primary btn-sm"> 
+                                        Papeis
                                     </a>
                                 </td>
                             </tr>

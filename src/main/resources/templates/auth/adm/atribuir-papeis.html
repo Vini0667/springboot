@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title> Novo usuário </title>
+        <title> Atribuir papeis </title>
         <link rel="stylesheet" th:href="@{/bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css}">
         <script th:src="@{/jquery-3.6.3/jquery-3.6.3.min.js}"></script>
         <script th:src="@{/bootstrap-5.3.0-alpha1-dist/js/bootstrap.min.js}"></script>
@@ -15,24 +15,23 @@
             }
         </style>
     </head>
-    
     <body>
         <div th:insert="Fragmentos/pesquise-bar :: nav"></div>
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <h2>Cadastro de Usuário </h2>
+                    <h2> Alterar Usuário </h2>
                     <div class="alert alert-sucess alert-dimissible fade show" th:if="${mensagem}">
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         <span th:text="${mensagem}"></span>
                     </div>
 
-                    <form action="#" th:action="@{/usuario/salvar}" th:object="${usuario}" method="post">
+                    <form action="#" th:action="@{/usuario/admin/editar/papeis/{id}(id=${usuario.id})}" th:object="${usuario}" method="post">
                         <div class="row mb-3">
                             <label class="col-sm-1 col-form-label">Nome:</label>
                             
                             <div class="col-sm-5">
-                              <input class="form-control" type="text" th:field="*{nome}" name="" id="">
+                              <input disabled  class="form-control" type="text" th:field="*{nome}" name="" id="">
                             </div>
 
                             <div class="col-sm-5">
@@ -44,7 +43,7 @@
                             <label class="col-sm-1 col-form-label">CPF:</label>
                             
                             <div class="col-sm-5">
-                              <input class="form-control" type="text" th:field="*{cpf}" name="" id="">
+                              <input disabled  class="form-control" type="text" th:field="*{cpf}" name="" id="">
                             </div>
 
                             <div class="col-sm-5">
@@ -56,7 +55,7 @@
                             <label class="col-sm-1 col-form-label">Data de Nascimento:</label>
                             
                             <div class="col-sm-5">
-                              <input class="form-control" type="text" th:field="*{dataNascimento}">
+                              <input disabled  class="form-control" type="text" th:field="*{dataNascimento}">
                             </div>
 
                             <div class="col-sm-5">
@@ -68,7 +67,7 @@
                             <label class="col-sm-1 col-form-label">Email:</label>
                             
                             <div class="col-sm-5">
-                              <input class="form-control" type="text" th:field="*{email}">
+                              <input disabled class="form-control" type="text" th:field="*{email}">
                             </div>
 
                             <div class="col-sm-5">
@@ -80,12 +79,11 @@
                             <label class="col-sm-1 col-form-label">Senha:</label>
                             
                             <div class="col-sm-5">
-                              <input class="form-control" type="text" th:field="*{password}">
+                              <input disabled class="form-control" type="text" th:field="*{password}">
                             </div>
 
                             <div class="col-sm-5">
                                 <span class="mensagem" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
-                                <span class="mensagem" th:if="${loginExistente}" th:text="${loginExistente}"></span>
                             </div>
                         </div>
 
@@ -93,7 +91,7 @@
                             <label class="col-sm-1 col-form-label">Login:</label>
                             
                             <div class="col-sm-5">
-                              <input class="form-control" type="text" th:field="*{login}" name="" id="">
+                              <input disabled class="form-control" type="text" th:field="*{login}" name="" id="">
                             </div>
 
                             <div class="col-sm-5">
@@ -101,7 +99,27 @@
                             </div>
                         </div>
 
-                        <input type="submit" class="btn btn-primary" value="Gravar"/>
+                        <div class="row mb-3">
+                            <label class="col-sm-1 col-form-label"> Papéis: </label>
+                            
+                            <div class="col-sm-2">
+                                <th:block th:each="pp : ${listaPapel}">
+                                    <div class="form-check" th:if="${#lists.contains(usuario.papeis, pp)}">
+                                        <input class="form-check" type="checkbox" th:value="${pp.id}" checked name="pps">
+                                        <label class="form-check-label" th:text="${pp.papel}"></label>
+                                    </div>
+                                    <div th:unless="${#lists.contains(usuario.papeis, pp)}" class="form-check">
+                                        <input class="form-check" type="checkbox" th:value="${pp.id}" name="pps">
+                                        <label class="form-check-label" th:text="${pp.papel}"></label>
+                                    </div>
+                                </th:block>
+                            </div>
+                            <div class="col-sm-5">
+                                <span class="mensagem" th:if="${mensagem}" th:text="${mensagem}"></span>
+                            </div>
+                        </div>
+
+                        <input type="submit" class="btn btn-primary" value="Alterar"/>
                     </form>
                 </div>
             </div>
