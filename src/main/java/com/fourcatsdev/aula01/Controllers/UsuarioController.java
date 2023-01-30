@@ -47,9 +47,8 @@ public class UsuarioController {
             model.addAttribute("loginExistente", "O login já exite digite outro");
             return "/publica-cria-usuario";
         }
-        Papel papel = papelRepository.findByPapel("USER");
         List<Papel> papeis = new ArrayList<Papel>();
-        papeis.add(papel);
+        papeis.add(papelRepository.findByPapel("USER"));
         usuario.setPapeis(papeis);
 
         usuarioRepositorio.save(usuario);
@@ -70,7 +69,7 @@ public class UsuarioController {
         return "redirect:/usuario/admin/listar";
     }
 
-    @GetMapping("/admin/editar/{id}")
+    @GetMapping("/editar/{id}")
     public String editarUser(@PathVariable("id") long id, Model model) {
         Optional<Usuario> usuarioVelho = usuarioRepositorio.findById(id);
         if (!usuarioVelho.isPresent())
@@ -81,7 +80,7 @@ public class UsuarioController {
         return "auth/user/user-alterar-usuario";
     }
 
-    @PostMapping("/admin/editar/{id}")
+    @PostMapping("/editar/{id}")
     public String editarUser(@PathVariable("id") long id, @Valid Usuario user, BindingResult result) {
         if (result.hasErrors()) {
             user.setId(id);
@@ -91,48 +90,55 @@ public class UsuarioController {
         return "redirect:/usuario/admin/listar";
     }
 
-    public boolean verificaLogin(Usuario user) {
-        Usuario usr = usuarioRepositorio.findByLogin(user.getLogin());
-        return usr != null ? true : false;
-    }
-
     @GetMapping("admin/editar/papeis/{id}")
     public String editaPapel(@PathVariable("id") long id, Model model) {
-        Optional<Usuario> userVelho = usuarioRepositorio.findById(id);
-        if (!userVelho.isPresent())
-            throw new IllegalArgumentException("Usuário inválido");
-        Usuario user1 = userVelho.get();
-        model.addAttribute("usuario", user1);
+        Usuario user = (Usuario) atribuiUserById(id);
+        model.addAttribute("usuario", user);
         model.addAttribute("listaPapel", papelRepository.findAll());
         return "auth/adm/atribuir-papeis";
     }
 
     @PostMapping("admin/editar/papeis/{id}")
-    public String editaPapel (@PathVariable ("id") long id, Usuario user, @RequestParam (value = "pps", required = false)
+    public String editaPapelEAtivação (@PathVariable ("id") long id, Usuario user, @RequestParam (value = "pps", required = false)
      int[] pps, RedirectAttributes attributes) {
         if (pps == null) {
             user.setId (id);
             attributes.addFlashAttribute("mensagem", "Pelo menos um papel deve estar selecionado");
             return "redirect:/usuario/admin/editar/papeis/" + id;
         } else {
-            List <Papel> papeis = new ArrayList <>();
-          
-            for (int i = 0; i < pps.length; i++) {
-                long idPapel = (long) pps[i];
-                Optional <Papel> papelOptional = papelRepository.findById(idPapel);
+            Usuario usuario = (Usuario) atribuiUserById(id);
+            usuario.setPapeis(listaPapeis(pps));
+            usuario.setAtivo(user.isAtivo());
 
-                if (papelOptional.isPresent()) {
-                    Papel papel = papelOptional.get();
-                    papeis.add(papel);
-                }
-            }
-            Optional <Usuario> userOptional = usuarioRepositorio.findById(id);
-            if (userOptional.isPresent()) {
-                Usuario usr = userOptional.get();
-                usr.setPapeis (papeis);
-                usuarioRepositorio.save(usr);
-            }
+            usuarioRepositorio.save(usuario);
         }
         return "redirect:/usuario/admin/listar";
+    
     }
-}
+
+    public boolean verificaPapelPorId (long idPapel) {
+        return papelRepository.findById(idPapel).isPresent() ? true : false;
+    }
+
+    public List <Papel> listaPapeis (int[] pps) {
+        List <Papel> papeis = new ArrayList <> ();
+        for (int i = 0; i < pps.length; i++) {
+            long idPapel = pps[i];
+
+            if (verificaPapelPorId(idPapel)) {
+                papeis.add(papelRepository.findById(idPapel).get());
+            }
+        }
+        return papeis;
+    }
+
+    public Object atribuiUserById (long idUser) {
+        Optional <Usuario> user = usuarioRepositorio.findById(idUser);
+        return user.isPresent() ? user.get() : new IllegalArgumentException("Usuário inválido");
+    }
+
+    public boolean verificaLogin(Usuario user) {
+        Usuario usr = usuarioRepositorio.findByLogin(user.getLogin());
+        return usr != null ? true : false;
+    }
+} 
